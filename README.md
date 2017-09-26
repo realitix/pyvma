@@ -1,2 +1,3 @@
-# pyvulkanmemoryallocator
-Python Wrapper for VulkanMemoryAllocator
+# PyVMA
+
+# Work In Progress
