@@ -36,9 +36,13 @@ def build_windows():
     call(cmd2, shell=True)
 
 
-if __name__ == '__main__':
+def build():
     build_platform = {
         'Linux': build_linux,
         'Windows': build_windows
     }
     build_platform[platform.system()]()
+
+
+if __name__ == '__main__':
+    build()

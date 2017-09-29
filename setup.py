@@ -34,5 +34,5 @@ setup(
     license="Apache 2.0",
     ext_package="pyvma",
     cmdclass={'build': VmaBuild},
-    cffi_modules=["_cffi_build/pyvma_build.py:ffi"]
+    cffi_modules=["_cffi_build/pyvma_build.py:ffibuilder"]
 )
