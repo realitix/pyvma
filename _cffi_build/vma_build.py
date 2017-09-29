@@ -8,7 +8,7 @@ LINUX = platform.system() == 'Linux'
 
 
 # ----------
-# BUILD STATIC LIB
+# BUILD STATIC LIB
 # ----------
 def build_linux():
     p1 = path.join(HERE, 'include')
