@@ -15,7 +15,7 @@ def build_linux():
     p2 = path.join(HERE, 'vk_mem_alloc.h')
     p3 = path.join(HERE, 'vk_mem_alloc.o')
     p4 = path.join(HERE, 'libvk_mem_alloc.a')
-    c = ' -DVMA_IMPLEMENTATION -DVMA_STATIC_VULKAN_FUNCTIONS=0 '
+    c = ' -DVMA_IMPLEMENTATION -D_DEBUG -DVMA_STATIC_VULKAN_FUNCTIONS=0 '
     cmd1 = 'g++ -std=c++11 -fPIC -x c++ -I' + p1 + c + '-c ' + p2 + ' -o ' + p3
     cmd2 = 'ar rvs ' + p4 + ' ' + p3
 

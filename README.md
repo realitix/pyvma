@@ -1,5 +1,10 @@
 # PyVMA
 
+# How to update
+
+- Update vk_mem_alloc.h
+- Run `cpp -std=c99 -P -Iinclude -o cdef/vk_mem_alloc.cdef.h vk_mem_alloc.h`
+
 # Work In Progress
 
 PyVMA is a wrapper for [Vulkan Memory Allocator](https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator).

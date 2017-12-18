@@ -13,10 +13,7 @@ LINUX = platform.system() == 'Linux'
 ffibuilder = FFI()
 
 # prepare cdef
-cdef = open(path.join(HERE, 'cdef', 'vulkan.cdef.h')).read()
-cdef += '\n'
-cdef += open(path.join(HERE, 'cdef', 'vk_mem_alloc.cdef.h')).read()
-ffibuilder.cdef(cdef)
+ffibuilder.cdef(open(path.join(HERE, 'cdef', 'vk_mem_alloc.cdef.h')).read())
 
 # prepare libraries
 l = ['vk_mem_alloc']
