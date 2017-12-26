@@ -40,6 +40,14 @@ def _vk_arg(arg):
     return ffi.cast('void*', ffi.addressof(arg))
 
 
+def VmaDeviceMemoryCallbacks(**kwargs):
+    return ffi.new('VmaDeviceMemoryCallbacks*', _new(kwargs))
+
+
+def VmaVulkanFunctions(**kwargs):
+    return ffi.new('VmaVulkanFunctions*', _new(kwargs))
+
+
 def VmaAllocatorCreateInfo(**kwargs):
     kwargs = _new(kwargs)
 
@@ -76,8 +84,36 @@ def VmaAllocatorCreateInfo(**kwargs):
     return ffi.new('VmaAllocatorCreateInfo*', kwargs)
 
 
+def VmaStatInfo(**kwargs):
+    return ffi.new('VmaStatInfo*', _new(kwargs))
+
+
+def VmaStat(**kwargs):
+    return ffi.new('VmaStat*', _new(kwargs))
+
+
 def VmaAllocationCreateInfo(**kwargs):
     return ffi.new('VmaAllocationCreateInfo*', _new(kwargs))
+
+
+def VmaPoolCreateInfo(**kwargs):
+    return ffi.new('VmaPoolCreateInfo*', _new(kwargs))
+
+
+def VmaPoolStat(**kwargs):
+    return ffi.new('VmaPoolStat*', _new(kwargs))
+
+
+def VmaAllocationInfo(**kwargs):
+    return ffi.new('VmaAllocationInfo*', _new(kwargs))
+
+
+def VmaDefragmentationInfo(**kwargs):
+    return ffi.new('VmaDefragmentationInfo*', kwargs)
+
+
+def VmaDefragmentationStats(**kwargs):
+    return ffi.new('VmaDefragmentationStats*', kwargs)
 
 
 def vmaCreateAllocator(pCreateInfo):
@@ -247,7 +283,9 @@ def vmaMapMemory(allocator, allocation):
     if result != vk.VK_SUCCESS:
         raise vk.exception_codes[result]
 
-    return ppData[0]
+    info = vmaGetAllocationInfo(allocator, allocation)
+
+    return ffi.buffer(ppData[0], info.size)
 
 
 def vmaUnmapMemory(allocator, allocation):
