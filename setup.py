@@ -52,7 +52,7 @@ class VmaBuild(build):
 
 setup(
     name="pyvma",
-    version='2.0.0.1',  # can't use pyshader.__version__
+    version='2.0.0-alpha.6.1',
     author="realitix",
     author_email="realitix@gmail.com",
     description="Python CFFI binding for Vulkan Memory Allocator",

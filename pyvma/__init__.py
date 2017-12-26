@@ -3,6 +3,9 @@ import vulkan as vk
 from pyvma._pyvma import ffi, lib
 
 
+__version__ = '2.0.0-alpha.6.1'
+
+
 VMA_MEMORY_USAGE_GPU_ONLY = lib.VMA_MEMORY_USAGE_GPU_ONLY
 VMA_MEMORY_USAGE_UNKNOWN = lib.VMA_MEMORY_USAGE_UNKNOWN
 VMA_MEMORY_USAGE_CPU_ONLY = lib.VMA_MEMORY_USAGE_CPU_ONLY
