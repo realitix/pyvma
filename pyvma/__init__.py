@@ -140,7 +140,7 @@ def vmaCreateBuffer(allocator, pBufferCreateInfo, pAllocationCreateInfo):
     if result != vk.VK_SUCCESS:
         raise vk.exception_codes[result]
 
-    return pBuffer[0], pAllocation[0], pAllocationInfo[0]
+    return ffi.cast('void*', pBuffer[0]), pAllocation[0], pAllocationInfo[0]
 
 
 def vmaDestroyBuffer(allocator, buffer, allocation):
@@ -318,7 +318,7 @@ def vmaCreateImage(allocator, pImageCreateInfo, pAllocationCreateInfo):
     if result != vk.VK_SUCCESS:
         raise vk.exception_codes[result]
 
-    return pImage[0], pAllocation[0], pAllocationInfo[0]
+    return ffi.cast('void*', pImage[0]), pAllocation[0], pAllocationInfo[0]
 
 
 def vmaDestroyImage(allocator, image, allocation):
