@@ -19,7 +19,7 @@ You can install it manually if you want the latest version:
 ```
 git clone https://github.com/realitix/pyvma
 cd pyvma
-python setup.py develop
+python setup.py build
 python setup.py install
 ```
 
