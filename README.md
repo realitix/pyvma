@@ -33,3 +33,4 @@ It follows the same conventions as `vulkan` wrapper.
 
 - Update vk_mem_alloc.h
 - Run `cpp -std=c99 -P -Iinclude -o cdef/vk_mem_alloc.cdef.h vk_mem_alloc.h`
+- Remove first lines declaring basic types in `vk_mem_alloc.cdef.h`
