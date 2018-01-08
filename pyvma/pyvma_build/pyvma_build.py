@@ -13,18 +13,24 @@ LINUX = platform.system() == 'Linux'
 ffibuilder = FFI()
 
 # prepare cdef
-ffibuilder.cdef(open(path.join(HERE, 'cdef', 'vk_mem_alloc.cdef.h')).read())
+cdef = ""
+if LINUX:
+    cdef += open(path.join(HERE, 'cdef', 'stddef.cdef.h')).read()
+cdef += open(path.join(HERE, 'cdef', 'vk_mem_alloc.cdef.h')).read()
+
+ffibuilder.cdef(cdef)
+
 
 # prepare libraries
-l = ['vk_mem_alloc']
+libs = ['vk_mem_alloc']
 if LINUX:
-    l += ['stdc++']
+    libs += ['stdc++']
 
 # prepare source
 ffibuilder.set_source(
     '_pyvma',
     open(path.join(HERE, 'vk_mem_alloc.h')).read(),
-    libraries=l,
+    libraries=libs,
     library_dirs=[HERE],
     extra_compile_args=["-I"+INCLUDE_FOLDER]
 )
@@ -32,4 +38,3 @@ ffibuilder.set_source(
 
 if __name__ == '__main__':
     ffibuilder.compile(verbose=True)
-
