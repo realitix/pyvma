@@ -25,6 +25,20 @@ class VmaBuild(build):
         call(cmd1, shell=True)
         call(cmd2, shell=True)
 
+
+    def build_darwin(self):
+        p1 = path.join(self.p, 'include')
+        p2 = path.join(self.p, 'vk_mem_alloc.h')
+        p3 = path.join(self.p, 'vk_mem_alloc.o')
+        p4 = path.join(self.p, 'libvk_mem_alloc.a')
+        c = ' -DVMA_IMPLEMENTATION -D_DEBUG -DVMA_STATIC_VULKAN_FUNCTIONS=0 '
+        cmd1 = 'g++ -std=c++11 -fPIC -x c++ -I' + p1 + c + '-c ' + p2 + ' -o ' + p3
+        cmd2 = 'ar rvs ' + p4 + ' ' + p3
+
+        call(cmd1, shell=True)
+        call(cmd2, shell=True)
+
+
     def build_windows(self):
         p1 = path.join(self.p, 'include')
         p2 = path.join(self.p, 'vk_mem_alloc.h')
@@ -43,7 +57,8 @@ class VmaBuild(build):
         self.p = path.join(self.p, 'pyvma_build')
         build_platform = {
             'Linux': self.build_linux,
-            'Windows': self.build_windows
+            'Windows': self.build_windows,
+            'Darwin': self.build_darwin,
         }
         build_platform[platform.system()]()
 
