@@ -20,8 +20,6 @@ VMA_ALLOCATOR_CREATE_FLAG_BITS_MAX_ENUM = lib.VMA_ALLOCATOR_CREATE_FLAG_BITS_MAX
 VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT = lib.VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT # noqa
 VMA_ALLOCATION_CREATE_NEVER_ALLOCATE_BIT = lib.VMA_ALLOCATION_CREATE_NEVER_ALLOCATE_BIT # noqa
 VMA_ALLOCATION_CREATE_MAPPED_BIT = lib.VMA_ALLOCATION_CREATE_MAPPED_BIT # noqa
-VMA_ALLOCATION_CREATE_CAN_BECOME_LOST_BIT = lib.VMA_ALLOCATION_CREATE_CAN_BECOME_LOST_BIT # noqa
-VMA_ALLOCATION_CREATE_CAN_MAKE_OTHER_LOST_BIT = lib.VMA_ALLOCATION_CREATE_CAN_MAKE_OTHER_LOST_BIT # noqa
 VMA_ALLOCATION_CREATE_USER_DATA_COPY_STRING_BIT = lib.VMA_ALLOCATION_CREATE_USER_DATA_COPY_STRING_BIT # noqa
 VMA_ALLOCATION_CREATE_FLAG_BITS_MAX_ENUM = lib.VMA_ALLOCATION_CREATE_FLAG_BITS_MAX_ENUM # noqa
 
@@ -56,20 +54,22 @@ def VmaAllocatorCreateInfo(**kwargs):
 
     if 'pVulkanFunctions' not in kwargs:
         functions = [
-            'vkGetPhysicalDeviceProperties',
-            'vkGetPhysicalDeviceMemoryProperties', 'vkAllocateMemory',
             'vkFreeMemory', 'vkMapMemory', 'vkUnmapMemory',
             'vkBindBufferMemory', 'vkBindImageMemory',
             'vkGetBufferMemoryRequirements', 'vkGetImageMemoryRequirements',
             'vkCreateBuffer', 'vkDestroyBuffer', 'vkCreateImage',
-            'vkDestroyImage'
+            'vkDestroyImage', 'vkFlushMappedMemoryRanges', 'vkInvalidateMappedMemoryRanges',
+            'vkGetDeviceBufferMemoryRequirements', 'vkGetDeviceImageMemoryRequirements',
+
         ]
         init_functions = {x: ffi.cast('PFN_' + x, getattr(vk.lib, x))
                           for x in functions}
 
         # add extension functions
         ext_functions = ['vkGetBufferMemoryRequirements2KHR',
-                         'vkGetImageMemoryRequirements2KHR']
+                         'vkGetImageMemoryRequirements2KHR',
+                         'vkBindBufferMemory2KHR', 'vkBindImageMemory2KHR',
+                         ]
         for x in ext_functions:
             fn = vk.lib.vkGetDeviceProcAddr(
                 kwargs['device'], ffi.new('char[]', x.encode('ascii')))
@@ -80,6 +80,9 @@ def VmaAllocatorCreateInfo(**kwargs):
             fn = ffi.cast('PFN_' + x, fn)
 
             init_functions[x] = fn
+
+        init_functions['vkGetDeviceProcAddr'] = vk.lib.vkGetDeviceProcAddr
+        init_functions['vkGetInstanceProcAddr'] = vk.lib.vkGetInstanceProcAddr
 
         vulkan_functions = ffi.new('VmaVulkanFunctions*', init_functions)
         kwargs['pVulkanFunctions'] = vulkan_functions
@@ -323,3 +326,4 @@ def vmaCreateImage(allocator, pImageCreateInfo, pAllocationCreateInfo):
 
 def vmaDestroyImage(allocator, image, allocation):
     lib.vmaDestroyImage(allocator, image, allocation)
+
