@@ -6,6 +6,7 @@ import platform
 HERE = path.dirname(path.realpath(__file__))
 INCLUDE_FOLDER = path.join(HERE, 'include')
 LINUX = platform.system() == 'Linux'
+DARWIN = platform.system() == 'Darwin'
 
 # ----------
 # BUILD WRAPPER
@@ -14,7 +15,7 @@ ffibuilder = FFI()
 
 # prepare cdef
 cdef = ""
-if LINUX:
+if LINUX or DARWIN:
     cdef += open(path.join(HERE, 'cdef', 'stddef.cdef.h')).read()
 cdef += open(path.join(HERE, 'cdef', 'vk_mem_alloc.cdef.h')).read()
 

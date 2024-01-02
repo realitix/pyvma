@@ -1,12 +1,16 @@
-
+typedef struct VkInstance_T* VkInstance;
 typedef struct VkDeviceMemory_T *VkDeviceMemory;
 typedef struct VkPhysicalDevice_T* VkPhysicalDevice;
 typedef struct VkBuffer_T *VkBuffer;
 typedef struct VkImage_T *VkImage;
 typedef struct VkDevice_T* VkDevice;
+typedef struct VkCommandBuffer_T* VkCommandBuffer;
 typedef uint64_t VkDeviceSize;
 typedef uint32_t VkFlags;
 typedef uint32_t VkBool32;
+typedef void ( *PFN_vkVoidFunction)(void);
+typedef PFN_vkVoidFunction ( *PFN_vkGetInstanceProcAddr)(VkInstance instance, const char* pName);
+typedef PFN_vkVoidFunction ( *PFN_vkGetDeviceProcAddr)(VkDevice device, const char* pName);
 typedef enum VkMemoryPropertyFlagBits {
     VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT = 0x00000001,
     VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT = 0x00000002,
@@ -18,7 +22,6 @@ typedef enum VkMemoryPropertyFlagBits {
 typedef VkFlags VkMemoryPropertyFlags;
 typedef enum VkMemoryHeapFlagBits {
     VK_MEMORY_HEAP_DEVICE_LOCAL_BIT = 0x00000001,
-    VK_MEMORY_HEAP_MULTI_INSTANCE_BIT_KHX = 0x00000002,
     VK_MEMORY_HEAP_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
 } VkMemoryHeapFlagBits;
 typedef VkFlags VkMemoryHeapFlags;
@@ -51,9 +54,6 @@ typedef enum VkResult {
     VK_ERROR_OUT_OF_POOL_MEMORY_KHR = -1000069000,
     VK_ERROR_INVALID_EXTERNAL_HANDLE_KHR = -1000072003,
     VK_ERROR_NOT_PERMITTED_EXT = -1000174001,
-    VK_RESULT_BEGIN_RANGE = VK_ERROR_FRAGMENTED_POOL,
-    VK_RESULT_END_RANGE = VK_INCOMPLETE,
-    VK_RESULT_RANGE_SIZE = (VK_INCOMPLETE - VK_ERROR_FRAGMENTED_POOL + 1),
     VK_RESULT_MAX_ENUM = 0x7FFFFFFF
 } VkResult;
 typedef enum VkPhysicalDeviceType {
@@ -62,9 +62,6 @@ typedef enum VkPhysicalDeviceType {
     VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU = 2,
     VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU = 3,
     VK_PHYSICAL_DEVICE_TYPE_CPU = 4,
-    VK_PHYSICAL_DEVICE_TYPE_BEGIN_RANGE = VK_PHYSICAL_DEVICE_TYPE_OTHER,
-    VK_PHYSICAL_DEVICE_TYPE_END_RANGE = VK_PHYSICAL_DEVICE_TYPE_CPU,
-    VK_PHYSICAL_DEVICE_TYPE_RANGE_SIZE = (VK_PHYSICAL_DEVICE_TYPE_CPU - VK_PHYSICAL_DEVICE_TYPE_OTHER + 1),
     VK_PHYSICAL_DEVICE_TYPE_MAX_ENUM = 0x7FFFFFFF
 } VkPhysicalDeviceType;
 typedef enum VkSampleCountFlagBits {
@@ -212,220 +209,8 @@ typedef struct VkMemoryHeap {
     VkDeviceSize size;
     VkMemoryHeapFlags flags;
 } VkMemoryHeap;
-typedef struct VkPhysicalDeviceMemoryProperties {
-    uint32_t memoryTypeCount;
-    VkMemoryType memoryTypes[32];
-    uint32_t memoryHeapCount;
-    VkMemoryHeap memoryHeaps[16];
-} VkPhysicalDeviceMemoryProperties;
 typedef enum VkStructureType {
     VK_STRUCTURE_TYPE_APPLICATION_INFO = 0,
-    VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO = 1,
-    VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO = 2,
-    VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO = 3,
-    VK_STRUCTURE_TYPE_SUBMIT_INFO = 4,
-    VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO = 5,
-    VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE = 6,
-    VK_STRUCTURE_TYPE_BIND_SPARSE_INFO = 7,
-    VK_STRUCTURE_TYPE_FENCE_CREATE_INFO = 8,
-    VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO = 9,
-    VK_STRUCTURE_TYPE_EVENT_CREATE_INFO = 10,
-    VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO = 11,
-    VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO = 12,
-    VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO = 13,
-    VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO = 14,
-    VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO = 15,
-    VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO = 16,
-    VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO = 17,
-    VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO = 18,
-    VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO = 19,
-    VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO = 20,
-    VK_STRUCTURE_TYPE_PIPELINE_TESSELLATION_STATE_CREATE_INFO = 21,
-    VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO = 22,
-    VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO = 23,
-    VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO = 24,
-    VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO = 25,
-    VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO = 26,
-    VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO = 27,
-    VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO = 28,
-    VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO = 29,
-    VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO = 30,
-    VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO = 31,
-    VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO = 32,
-    VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO = 33,
-    VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO = 34,
-    VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET = 35,
-    VK_STRUCTURE_TYPE_COPY_DESCRIPTOR_SET = 36,
-    VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO = 37,
-    VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO = 38,
-    VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO = 39,
-    VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO = 40,
-    VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO = 41,
-    VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO = 42,
-    VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO = 43,
-    VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER = 44,
-    VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER = 45,
-    VK_STRUCTURE_TYPE_MEMORY_BARRIER = 46,
-    VK_STRUCTURE_TYPE_LOADER_INSTANCE_CREATE_INFO = 47,
-    VK_STRUCTURE_TYPE_LOADER_DEVICE_CREATE_INFO = 48,
-    VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR = 1000001000,
-    VK_STRUCTURE_TYPE_PRESENT_INFO_KHR = 1000001001,
-    VK_STRUCTURE_TYPE_DISPLAY_MODE_CREATE_INFO_KHR = 1000002000,
-    VK_STRUCTURE_TYPE_DISPLAY_SURFACE_CREATE_INFO_KHR = 1000002001,
-    VK_STRUCTURE_TYPE_DISPLAY_PRESENT_INFO_KHR = 1000003000,
-    VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR = 1000004000,
-    VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR = 1000005000,
-    VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR = 1000006000,
-    VK_STRUCTURE_TYPE_MIR_SURFACE_CREATE_INFO_KHR = 1000007000,
-    VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR = 1000008000,
-    VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR = 1000009000,
-    VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT = 1000011000,
-    VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_RASTERIZATION_ORDER_AMD = 1000018000,
-    VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT = 1000022000,
-    VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_TAG_INFO_EXT = 1000022001,
-    VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT = 1000022002,
-    VK_STRUCTURE_TYPE_DEDICATED_ALLOCATION_IMAGE_CREATE_INFO_NV = 1000026000,
-    VK_STRUCTURE_TYPE_DEDICATED_ALLOCATION_BUFFER_CREATE_INFO_NV = 1000026001,
-    VK_STRUCTURE_TYPE_DEDICATED_ALLOCATION_MEMORY_ALLOCATE_INFO_NV = 1000026002,
-    VK_STRUCTURE_TYPE_TEXTURE_LOD_GATHER_FORMAT_PROPERTIES_AMD = 1000041000,
-    VK_STRUCTURE_TYPE_RENDER_PASS_MULTIVIEW_CREATE_INFO_KHX = 1000053000,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES_KHX = 1000053001,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PROPERTIES_KHX = 1000053002,
-    VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_IMAGE_CREATE_INFO_NV = 1000056000,
-    VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO_NV = 1000056001,
-    VK_STRUCTURE_TYPE_IMPORT_MEMORY_WIN32_HANDLE_INFO_NV = 1000057000,
-    VK_STRUCTURE_TYPE_EXPORT_MEMORY_WIN32_HANDLE_INFO_NV = 1000057001,
-    VK_STRUCTURE_TYPE_WIN32_KEYED_MUTEX_ACQUIRE_RELEASE_INFO_NV = 1000058000,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2_KHR = 1000059000,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2_KHR = 1000059001,
-    VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2_KHR = 1000059002,
-    VK_STRUCTURE_TYPE_IMAGE_FORMAT_PROPERTIES_2_KHR = 1000059003,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_IMAGE_FORMAT_INFO_2_KHR = 1000059004,
-    VK_STRUCTURE_TYPE_QUEUE_FAMILY_PROPERTIES_2_KHR = 1000059005,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_PROPERTIES_2_KHR = 1000059006,
-    VK_STRUCTURE_TYPE_SPARSE_IMAGE_FORMAT_PROPERTIES_2_KHR = 1000059007,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SPARSE_IMAGE_FORMAT_INFO_2_KHR = 1000059008,
-    VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO_KHX = 1000060000,
-    VK_STRUCTURE_TYPE_DEVICE_GROUP_RENDER_PASS_BEGIN_INFO_KHX = 1000060003,
-    VK_STRUCTURE_TYPE_DEVICE_GROUP_COMMAND_BUFFER_BEGIN_INFO_KHX = 1000060004,
-    VK_STRUCTURE_TYPE_DEVICE_GROUP_SUBMIT_INFO_KHX = 1000060005,
-    VK_STRUCTURE_TYPE_DEVICE_GROUP_BIND_SPARSE_INFO_KHX = 1000060006,
-    VK_STRUCTURE_TYPE_ACQUIRE_NEXT_IMAGE_INFO_KHX = 1000060010,
-    VK_STRUCTURE_TYPE_BIND_BUFFER_MEMORY_DEVICE_GROUP_INFO_KHX = 1000060013,
-    VK_STRUCTURE_TYPE_BIND_IMAGE_MEMORY_DEVICE_GROUP_INFO_KHX = 1000060014,
-    VK_STRUCTURE_TYPE_DEVICE_GROUP_PRESENT_CAPABILITIES_KHX = 1000060007,
-    VK_STRUCTURE_TYPE_IMAGE_SWAPCHAIN_CREATE_INFO_KHX = 1000060008,
-    VK_STRUCTURE_TYPE_BIND_IMAGE_MEMORY_SWAPCHAIN_INFO_KHX = 1000060009,
-    VK_STRUCTURE_TYPE_DEVICE_GROUP_PRESENT_INFO_KHX = 1000060011,
-    VK_STRUCTURE_TYPE_DEVICE_GROUP_SWAPCHAIN_CREATE_INFO_KHX = 1000060012,
-    VK_STRUCTURE_TYPE_VALIDATION_FLAGS_EXT = 1000061000,
-    VK_STRUCTURE_TYPE_VI_SURFACE_CREATE_INFO_NN = 1000062000,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_GROUP_PROPERTIES_KHX = 1000070000,
-    VK_STRUCTURE_TYPE_DEVICE_GROUP_DEVICE_CREATE_INFO_KHX = 1000070001,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_IMAGE_FORMAT_INFO_KHR = 1000071000,
-    VK_STRUCTURE_TYPE_EXTERNAL_IMAGE_FORMAT_PROPERTIES_KHR = 1000071001,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_BUFFER_INFO_KHR = 1000071002,
-    VK_STRUCTURE_TYPE_EXTERNAL_BUFFER_PROPERTIES_KHR = 1000071003,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ID_PROPERTIES_KHR = 1000071004,
-    VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_BUFFER_CREATE_INFO_KHR = 1000072000,
-    VK_STRUCTURE_TYPE_EXTERNAL_MEMORY_IMAGE_CREATE_INFO_KHR = 1000072001,
-    VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO_KHR = 1000072002,
-    VK_STRUCTURE_TYPE_IMPORT_MEMORY_WIN32_HANDLE_INFO_KHR = 1000073000,
-    VK_STRUCTURE_TYPE_EXPORT_MEMORY_WIN32_HANDLE_INFO_KHR = 1000073001,
-    VK_STRUCTURE_TYPE_MEMORY_WIN32_HANDLE_PROPERTIES_KHR = 1000073002,
-    VK_STRUCTURE_TYPE_MEMORY_GET_WIN32_HANDLE_INFO_KHR = 1000073003,
-    VK_STRUCTURE_TYPE_IMPORT_MEMORY_FD_INFO_KHR = 1000074000,
-    VK_STRUCTURE_TYPE_MEMORY_FD_PROPERTIES_KHR = 1000074001,
-    VK_STRUCTURE_TYPE_MEMORY_GET_FD_INFO_KHR = 1000074002,
-    VK_STRUCTURE_TYPE_WIN32_KEYED_MUTEX_ACQUIRE_RELEASE_INFO_KHR = 1000075000,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_SEMAPHORE_INFO_KHR = 1000076000,
-    VK_STRUCTURE_TYPE_EXTERNAL_SEMAPHORE_PROPERTIES_KHR = 1000076001,
-    VK_STRUCTURE_TYPE_EXPORT_SEMAPHORE_CREATE_INFO_KHR = 1000077000,
-    VK_STRUCTURE_TYPE_IMPORT_SEMAPHORE_WIN32_HANDLE_INFO_KHR = 1000078000,
-    VK_STRUCTURE_TYPE_EXPORT_SEMAPHORE_WIN32_HANDLE_INFO_KHR = 1000078001,
-    VK_STRUCTURE_TYPE_D3D12_FENCE_SUBMIT_INFO_KHR = 1000078002,
-    VK_STRUCTURE_TYPE_SEMAPHORE_GET_WIN32_HANDLE_INFO_KHR = 1000078003,
-    VK_STRUCTURE_TYPE_IMPORT_SEMAPHORE_FD_INFO_KHR = 1000079000,
-    VK_STRUCTURE_TYPE_SEMAPHORE_GET_FD_INFO_KHR = 1000079001,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PUSH_DESCRIPTOR_PROPERTIES_KHR = 1000080000,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_16BIT_STORAGE_FEATURES_KHR = 1000083000,
-    VK_STRUCTURE_TYPE_PRESENT_REGIONS_KHR = 1000084000,
-    VK_STRUCTURE_TYPE_DESCRIPTOR_UPDATE_TEMPLATE_CREATE_INFO_KHR = 1000085000,
-    VK_STRUCTURE_TYPE_OBJECT_TABLE_CREATE_INFO_NVX = 1000086000,
-    VK_STRUCTURE_TYPE_INDIRECT_COMMANDS_LAYOUT_CREATE_INFO_NVX = 1000086001,
-    VK_STRUCTURE_TYPE_CMD_PROCESS_COMMANDS_INFO_NVX = 1000086002,
-    VK_STRUCTURE_TYPE_CMD_RESERVE_SPACE_FOR_COMMANDS_INFO_NVX = 1000086003,
-    VK_STRUCTURE_TYPE_DEVICE_GENERATED_COMMANDS_LIMITS_NVX = 1000086004,
-    VK_STRUCTURE_TYPE_DEVICE_GENERATED_COMMANDS_FEATURES_NVX = 1000086005,
-    VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_W_SCALING_STATE_CREATE_INFO_NV = 1000087000,
-    VK_STRUCTURE_TYPE_SURFACE_CAPABILITIES_2_EXT = 1000090000,
-    VK_STRUCTURE_TYPE_DISPLAY_POWER_INFO_EXT = 1000091000,
-    VK_STRUCTURE_TYPE_DEVICE_EVENT_INFO_EXT = 1000091001,
-    VK_STRUCTURE_TYPE_DISPLAY_EVENT_INFO_EXT = 1000091002,
-    VK_STRUCTURE_TYPE_SWAPCHAIN_COUNTER_CREATE_INFO_EXT = 1000091003,
-    VK_STRUCTURE_TYPE_PRESENT_TIMES_INFO_GOOGLE = 1000092000,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_PER_VIEW_ATTRIBUTES_PROPERTIES_NVX = 1000097000,
-    VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_SWIZZLE_STATE_CREATE_INFO_NV = 1000098000,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DISCARD_RECTANGLE_PROPERTIES_EXT = 1000099000,
-    VK_STRUCTURE_TYPE_PIPELINE_DISCARD_RECTANGLE_STATE_CREATE_INFO_EXT = 1000099001,
-    VK_STRUCTURE_TYPE_HDR_METADATA_EXT = 1000105000,
-    VK_STRUCTURE_TYPE_SHARED_PRESENT_SURFACE_CAPABILITIES_KHR = 1000111000,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_FENCE_INFO_KHR = 1000112000,
-    VK_STRUCTURE_TYPE_EXTERNAL_FENCE_PROPERTIES_KHR = 1000112001,
-    VK_STRUCTURE_TYPE_EXPORT_FENCE_CREATE_INFO_KHR = 1000113000,
-    VK_STRUCTURE_TYPE_IMPORT_FENCE_WIN32_HANDLE_INFO_KHR = 1000114000,
-    VK_STRUCTURE_TYPE_EXPORT_FENCE_WIN32_HANDLE_INFO_KHR = 1000114001,
-    VK_STRUCTURE_TYPE_FENCE_GET_WIN32_HANDLE_INFO_KHR = 1000114002,
-    VK_STRUCTURE_TYPE_IMPORT_FENCE_FD_INFO_KHR = 1000115000,
-    VK_STRUCTURE_TYPE_FENCE_GET_FD_INFO_KHR = 1000115001,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_POINT_CLIPPING_PROPERTIES_KHR = 1000117000,
-    VK_STRUCTURE_TYPE_RENDER_PASS_INPUT_ATTACHMENT_ASPECT_CREATE_INFO_KHR = 1000117001,
-    VK_STRUCTURE_TYPE_IMAGE_VIEW_USAGE_CREATE_INFO_KHR = 1000117002,
-    VK_STRUCTURE_TYPE_PIPELINE_TESSELLATION_DOMAIN_ORIGIN_STATE_CREATE_INFO_KHR = 1000117003,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SURFACE_INFO_2_KHR = 1000119000,
-    VK_STRUCTURE_TYPE_SURFACE_CAPABILITIES_2_KHR = 1000119001,
-    VK_STRUCTURE_TYPE_SURFACE_FORMAT_2_KHR = 1000119002,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VARIABLE_POINTER_FEATURES_KHR = 1000120000,
-    VK_STRUCTURE_TYPE_IOS_SURFACE_CREATE_INFO_MVK = 1000122000,
-    VK_STRUCTURE_TYPE_MACOS_SURFACE_CREATE_INFO_MVK = 1000123000,
-    VK_STRUCTURE_TYPE_MEMORY_DEDICATED_REQUIREMENTS_KHR = 1000127000,
-    VK_STRUCTURE_TYPE_MEMORY_DEDICATED_ALLOCATE_INFO_KHR = 1000127001,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_FILTER_MINMAX_PROPERTIES_EXT = 1000130000,
-    VK_STRUCTURE_TYPE_SAMPLER_REDUCTION_MODE_CREATE_INFO_EXT = 1000130001,
-    VK_STRUCTURE_TYPE_SAMPLE_LOCATIONS_INFO_EXT = 1000143000,
-    VK_STRUCTURE_TYPE_RENDER_PASS_SAMPLE_LOCATIONS_BEGIN_INFO_EXT = 1000143001,
-    VK_STRUCTURE_TYPE_PIPELINE_SAMPLE_LOCATIONS_STATE_CREATE_INFO_EXT = 1000143002,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLE_LOCATIONS_PROPERTIES_EXT = 1000143003,
-    VK_STRUCTURE_TYPE_MULTISAMPLE_PROPERTIES_EXT = 1000143004,
-    VK_STRUCTURE_TYPE_BUFFER_MEMORY_REQUIREMENTS_INFO_2_KHR = 1000146000,
-    VK_STRUCTURE_TYPE_IMAGE_MEMORY_REQUIREMENTS_INFO_2_KHR = 1000146001,
-    VK_STRUCTURE_TYPE_IMAGE_SPARSE_MEMORY_REQUIREMENTS_INFO_2_KHR = 1000146002,
-    VK_STRUCTURE_TYPE_MEMORY_REQUIREMENTS_2_KHR = 1000146003,
-    VK_STRUCTURE_TYPE_SPARSE_IMAGE_MEMORY_REQUIREMENTS_2_KHR = 1000146004,
-    VK_STRUCTURE_TYPE_IMAGE_FORMAT_LIST_CREATE_INFO_KHR = 1000147000,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BLEND_OPERATION_ADVANCED_FEATURES_EXT = 1000148000,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BLEND_OPERATION_ADVANCED_PROPERTIES_EXT = 1000148001,
-    VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_ADVANCED_STATE_CREATE_INFO_EXT = 1000148002,
-    VK_STRUCTURE_TYPE_PIPELINE_COVERAGE_TO_COLOR_STATE_CREATE_INFO_NV = 1000149000,
-    VK_STRUCTURE_TYPE_PIPELINE_COVERAGE_MODULATION_STATE_CREATE_INFO_NV = 1000152000,
-    VK_STRUCTURE_TYPE_SAMPLER_YCBCR_CONVERSION_CREATE_INFO_KHR = 1000156000,
-    VK_STRUCTURE_TYPE_SAMPLER_YCBCR_CONVERSION_INFO_KHR = 1000156001,
-    VK_STRUCTURE_TYPE_BIND_IMAGE_PLANE_MEMORY_INFO_KHR = 1000156002,
-    VK_STRUCTURE_TYPE_IMAGE_PLANE_MEMORY_REQUIREMENTS_INFO_KHR = 1000156003,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SAMPLER_YCBCR_CONVERSION_FEATURES_KHR = 1000156004,
-    VK_STRUCTURE_TYPE_SAMPLER_YCBCR_CONVERSION_IMAGE_FORMAT_PROPERTIES_KHR = 1000156005,
-    VK_STRUCTURE_TYPE_BIND_BUFFER_MEMORY_INFO_KHR = 1000157000,
-    VK_STRUCTURE_TYPE_BIND_IMAGE_MEMORY_INFO_KHR = 1000157001,
-    VK_STRUCTURE_TYPE_VALIDATION_CACHE_CREATE_INFO_EXT = 1000160000,
-    VK_STRUCTURE_TYPE_SHADER_MODULE_VALIDATION_CACHE_CREATE_INFO_EXT = 1000160001,
-    VK_STRUCTURE_TYPE_DEVICE_QUEUE_GLOBAL_PRIORITY_CREATE_INFO_EXT = 1000174000,
-    VK_STRUCTURE_TYPE_IMPORT_MEMORY_HOST_POINTER_INFO_EXT = 1000178000,
-    VK_STRUCTURE_TYPE_MEMORY_HOST_POINTER_PROPERTIES_EXT = 1000178001,
-    VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTERNAL_MEMORY_HOST_PROPERTIES_EXT = 1000178002,
-    VK_STRUCTURE_TYPE_BEGIN_RANGE = VK_STRUCTURE_TYPE_APPLICATION_INFO,
-    VK_STRUCTURE_TYPE_END_RANGE = VK_STRUCTURE_TYPE_LOADER_DEVICE_CREATE_INFO,
-    VK_STRUCTURE_TYPE_RANGE_SIZE = (VK_STRUCTURE_TYPE_LOADER_DEVICE_CREATE_INFO - VK_STRUCTURE_TYPE_APPLICATION_INFO + 1),
-    VK_STRUCTURE_TYPE_MAX_ENUM = 0x7FFFFFFF
 } VkStructureType;
 typedef struct VkMemoryAllocateInfo {
     VkStructureType sType;
@@ -439,16 +224,10 @@ typedef enum VkSystemAllocationScope {
     VK_SYSTEM_ALLOCATION_SCOPE_CACHE = 2,
     VK_SYSTEM_ALLOCATION_SCOPE_DEVICE = 3,
     VK_SYSTEM_ALLOCATION_SCOPE_INSTANCE = 4,
-    VK_SYSTEM_ALLOCATION_SCOPE_BEGIN_RANGE = VK_SYSTEM_ALLOCATION_SCOPE_COMMAND,
-    VK_SYSTEM_ALLOCATION_SCOPE_END_RANGE = VK_SYSTEM_ALLOCATION_SCOPE_INSTANCE,
-    VK_SYSTEM_ALLOCATION_SCOPE_RANGE_SIZE = (VK_SYSTEM_ALLOCATION_SCOPE_INSTANCE - VK_SYSTEM_ALLOCATION_SCOPE_COMMAND + 1),
     VK_SYSTEM_ALLOCATION_SCOPE_MAX_ENUM = 0x7FFFFFFF
 } VkSystemAllocationScope;
 typedef enum VkInternalAllocationType {
     VK_INTERNAL_ALLOCATION_TYPE_EXECUTABLE = 0,
-    VK_INTERNAL_ALLOCATION_TYPE_BEGIN_RANGE = VK_INTERNAL_ALLOCATION_TYPE_EXECUTABLE,
-    VK_INTERNAL_ALLOCATION_TYPE_END_RANGE = VK_INTERNAL_ALLOCATION_TYPE_EXECUTABLE,
-    VK_INTERNAL_ALLOCATION_TYPE_RANGE_SIZE = (VK_INTERNAL_ALLOCATION_TYPE_EXECUTABLE - VK_INTERNAL_ALLOCATION_TYPE_EXECUTABLE + 1),
     VK_INTERNAL_ALLOCATION_TYPE_MAX_ENUM = 0x7FFFFFFF
 } VkInternalAllocationType;
 typedef void* ( *PFN_vkAllocationFunction)(
@@ -499,9 +278,6 @@ typedef VkFlags VkBufferCreateFlags;
 typedef enum VkSharingMode {
     VK_SHARING_MODE_EXCLUSIVE = 0,
     VK_SHARING_MODE_CONCURRENT = 1,
-    VK_SHARING_MODE_BEGIN_RANGE = VK_SHARING_MODE_EXCLUSIVE,
-    VK_SHARING_MODE_END_RANGE = VK_SHARING_MODE_CONCURRENT,
-    VK_SHARING_MODE_RANGE_SIZE = (VK_SHARING_MODE_CONCURRENT - VK_SHARING_MODE_EXCLUSIVE + 1),
     VK_SHARING_MODE_MAX_ENUM = 0x7FFFFFFF
 } VkSharingMode;
 typedef enum VkBufferUsageFlagBits {
@@ -532,9 +308,6 @@ typedef enum VkImageType {
     VK_IMAGE_TYPE_1D = 0,
     VK_IMAGE_TYPE_2D = 1,
     VK_IMAGE_TYPE_3D = 2,
-    VK_IMAGE_TYPE_BEGIN_RANGE = VK_IMAGE_TYPE_1D,
-    VK_IMAGE_TYPE_END_RANGE = VK_IMAGE_TYPE_3D,
-    VK_IMAGE_TYPE_RANGE_SIZE = (VK_IMAGE_TYPE_3D - VK_IMAGE_TYPE_1D + 1),
     VK_IMAGE_TYPE_MAX_ENUM = 0x7FFFFFFF
 } VkImageType;
 typedef enum VkFormat {
@@ -765,9 +538,6 @@ typedef enum VkFormat {
     VK_FORMAT_G16_B16_R16_3PLANE_422_UNORM_KHR = 1000156031,
     VK_FORMAT_G16_B16R16_2PLANE_422_UNORM_KHR = 1000156032,
     VK_FORMAT_G16_B16_R16_3PLANE_444_UNORM_KHR = 1000156033,
-    VK_FORMAT_BEGIN_RANGE = VK_FORMAT_UNDEFINED,
-    VK_FORMAT_END_RANGE = VK_FORMAT_ASTC_12x12_SRGB_BLOCK,
-    VK_FORMAT_RANGE_SIZE = (VK_FORMAT_ASTC_12x12_SRGB_BLOCK - VK_FORMAT_UNDEFINED + 1),
     VK_FORMAT_MAX_ENUM = 0x7FFFFFFF
 } VkFormat;
 typedef struct VkExtent3D {
@@ -778,9 +548,6 @@ typedef struct VkExtent3D {
 typedef enum VkImageTiling {
     VK_IMAGE_TILING_OPTIMAL = 0,
     VK_IMAGE_TILING_LINEAR = 1,
-    VK_IMAGE_TILING_BEGIN_RANGE = VK_IMAGE_TILING_OPTIMAL,
-    VK_IMAGE_TILING_END_RANGE = VK_IMAGE_TILING_LINEAR,
-    VK_IMAGE_TILING_RANGE_SIZE = (VK_IMAGE_TILING_LINEAR - VK_IMAGE_TILING_OPTIMAL + 1),
     VK_IMAGE_TILING_MAX_ENUM = 0x7FFFFFFF
 } VkImageTiling;
 typedef VkFlags VkImageUsageFlags;
@@ -798,9 +565,6 @@ typedef enum VkImageLayout {
     VK_IMAGE_LAYOUT_SHARED_PRESENT_KHR = 1000111000,
     VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_STENCIL_ATTACHMENT_OPTIMAL_KHR = 1000117000,
     VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_STENCIL_READ_ONLY_OPTIMAL_KHR = 1000117001,
-    VK_IMAGE_LAYOUT_BEGIN_RANGE = VK_IMAGE_LAYOUT_UNDEFINED,
-    VK_IMAGE_LAYOUT_END_RANGE = VK_IMAGE_LAYOUT_PREINITIALIZED,
-    VK_IMAGE_LAYOUT_RANGE_SIZE = (VK_IMAGE_LAYOUT_PREINITIALIZED - VK_IMAGE_LAYOUT_UNDEFINED + 1),
     VK_IMAGE_LAYOUT_MAX_ENUM = 0x7FFFFFFF
 } VkImageLayout;
 typedef struct VkImageCreateInfo {
@@ -847,6 +611,13 @@ typedef struct VkMemoryDedicatedRequirementsKHR {
     VkBool32 prefersDedicatedAllocation;
     VkBool32 requiresDedicatedAllocation;
 } VkMemoryDedicatedRequirementsKHR;
+
+typedef struct VkPhysicalDeviceMemoryProperties {
+    uint32_t memoryTypeCount;
+    VkMemoryType memoryTypes[32U];
+    uint32_t memoryHeapCount;
+    VkMemoryHeap memoryHeaps[16U];
+} VkPhysicalDeviceMemoryProperties;
 typedef void ( *PFN_vkGetPhysicalDeviceMemoryProperties)(VkPhysicalDevice physicalDevice, VkPhysicalDeviceMemoryProperties* pMemoryProperties);
 typedef VkResult ( *PFN_vkAllocateMemory)(VkDevice device, const VkMemoryAllocateInfo* pAllocateInfo, const VkAllocationCallbacks* pAllocator, VkDeviceMemory* pMemory);
 typedef void ( *PFN_vkFreeMemory)(VkDevice device, VkDeviceMemory memory, const VkAllocationCallbacks* pAllocator);
@@ -863,103 +634,119 @@ typedef void ( *PFN_vkDestroyImage)(VkDevice device, VkImage image, const VkAllo
 typedef void ( *PFN_vkGetPhysicalDeviceProperties)(VkPhysicalDevice physicalDevice, VkPhysicalDeviceProperties* pProperties);
 typedef void ( *PFN_vkGetImageMemoryRequirements2KHR)(VkDevice device, const VkImageMemoryRequirementsInfo2KHR* pInfo, VkMemoryRequirements2KHR* pMemoryRequirements);
 typedef void ( *PFN_vkGetBufferMemoryRequirements2KHR)(VkDevice device, const VkBufferMemoryRequirementsInfo2KHR* pInfo, VkMemoryRequirements2KHR* pMemoryRequirements);
-typedef struct VmaAllocator_T* VmaAllocator;
-typedef void ( *PFN_vmaAllocateDeviceMemoryFunction)(
-    VmaAllocator allocator,
-    uint32_t memoryType,
-    VkDeviceMemory memory,
-    VkDeviceSize size);
-typedef void ( *PFN_vmaFreeDeviceMemoryFunction)(
-    VmaAllocator allocator,
-    uint32_t memoryType,
-    VkDeviceMemory memory,
-    VkDeviceSize size);
-typedef struct VmaDeviceMemoryCallbacks {
-    PFN_vmaAllocateDeviceMemoryFunction pfnAllocate;
-    PFN_vmaFreeDeviceMemoryFunction pfnFree;
-} VmaDeviceMemoryCallbacks;
-typedef enum VmaAllocatorCreateFlagBits {
+
+typedef struct VkMappedMemoryRange {
+    VkStructureType sType;
+    const void* pNext;
+    VkDeviceMemory memory;
+    VkDeviceSize offset;
+    VkDeviceSize size; 
+} VkMappedMemoryRange;
+
+typedef struct VkBufferCopy { 
+    VkDeviceSize srcOffset;
+    VkDeviceSize dstOffset;
+    VkDeviceSize size;
+} VkBufferCopy;
+
+typedef struct VkBindBufferMemoryInfo {
+    VkStructureType sType;
+    const void* pNext;
+    VkBuffer buffer;
+    VkDeviceMemory memory;
+    VkDeviceSize memoryOffset;
+} VkBindBufferMemoryInfo;
+typedef struct VkBindImageMemoryInfo {
+    VkStructureType sType;
+    const void* pNext;
+    VkImage image;
+    VkDeviceMemory memory;
+    VkDeviceSize memoryOffset;
+} VkBindImageMemoryInfo;
+
+typedef struct VkPhysicalDeviceMemoryProperties2 {
+    VkStructureType sType;
+    void* pNext;
+    VkPhysicalDeviceMemoryProperties memoryProperties;
+} VkPhysicalDeviceMemoryProperties2;
+
+typedef struct VkImageSparseMemoryRequirementsInfo2 {
+    VkStructureType sType;
+    const void* pNext;
+    VkImage image;
+} VkImageSparseMemoryRequirementsInfo2;
+typedef struct VkMemoryRequirements2 {
+    VkStructureType sType;
+    void* pNext; 
+    VkMemoryRequirements memoryRequirements;
+} VkMemoryRequirements2;
+
+typedef enum VkImageAspectFlagBits {
+    VK_IMAGE_ASPECT_COLOR_BIT = 0x00000001,
+    VK_IMAGE_ASPECT_DEPTH_BIT = 0x00000002,
+    VK_IMAGE_ASPECT_STENCIL_BIT = 0x00000004,
+    VK_IMAGE_ASPECT_METADATA_BIT = 0x00000008,
+    VK_IMAGE_ASPECT_PLANE_0_BIT = 0x00000010,
+    VK_IMAGE_ASPECT_PLANE_1_BIT = 0x00000020,
+    VK_IMAGE_ASPECT_PLANE_2_BIT = 0x00000040,
+    VK_IMAGE_ASPECT_NONE = 0,
+    VK_IMAGE_ASPECT_MEMORY_PLANE_0_BIT_EXT = 0x00000080,
+    VK_IMAGE_ASPECT_MEMORY_PLANE_1_BIT_EXT = 0x00000100,
+    VK_IMAGE_ASPECT_MEMORY_PLANE_2_BIT_EXT = 0x00000200,
+    VK_IMAGE_ASPECT_MEMORY_PLANE_3_BIT_EXT = 0x00000400,
+    VK_IMAGE_ASPECT_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
+} VkImageAspectFlagBits;
+
+
+typedef struct VkDeviceBufferMemoryRequirements {
+    VkStructureType sType;
+    const void* pNext;
+    const VkBufferCreateInfo* pCreateInfo;
+} VkDeviceBufferMemoryRequirements;
+typedef struct VkDeviceImageMemoryRequirements {
+    VkStructureType sType;
+    const void* pNext;
+    const VkImageCreateInfo* pCreateInfo;
+    VkImageAspectFlagBits planeAspect;
+} VkDeviceImageMemoryRequirements;
+
+
+
+typedef VkResult ( *PFN_vkFlushMappedMemoryRanges)(VkDevice device, uint32_t memoryRangeCount, const VkMappedMemoryRange* pMemoryRanges);
+typedef VkResult ( *PFN_vkInvalidateMappedMemoryRanges)(VkDevice device, uint32_t memoryRangeCount, const VkMappedMemoryRange* pMemoryRanges);
+typedef void ( *PFN_vkCmdCopyBuffer)(VkCommandBuffer commandBuffer, VkBuffer srcBuffer, VkBuffer dstBuffer, uint32_t regionCount, const VkBufferCopy* pRegions);
+
+typedef VkResult ( *PFN_vkBindBufferMemory2KHR)(VkDevice device, uint32_t bindInfoCount, const VkBindBufferMemoryInfo* pBindInfos);
+typedef VkResult ( *PFN_vkBindImageMemory2KHR)(VkDevice device, uint32_t bindInfoCount, const VkBindImageMemoryInfo* pBindInfos);
+typedef void ( *PFN_vkGetPhysicalDeviceMemoryProperties2KHR)(VkPhysicalDevice physicalDevice, VkPhysicalDeviceMemoryProperties2* pMemoryProperties);
+
+typedef void ( *PFN_vkGetDeviceBufferMemoryRequirements)(VkDevice device, const VkDeviceBufferMemoryRequirements* pInfo, VkMemoryRequirements2* pMemoryRequirements);
+typedef void ( *PFN_vkGetDeviceImageMemoryRequirements)(VkDevice device, const VkDeviceImageMemoryRequirements* pInfo, VkMemoryRequirements2* pMemoryRequirements);
+
+typedef VkFlags VkExternalMemoryHandleTypeFlags;
+typedef enum VkExternalMemoryFeatureFlagBits {
+    VK_EXTERNAL_MEMORY_FEATURE_DEDICATED_ONLY_BIT = 0x00000001,
+    VK_EXTERNAL_MEMORY_FEATURE_EXPORTABLE_BIT = 0x00000002,
+    VK_EXTERNAL_MEMORY_FEATURE_IMPORTABLE_BIT = 0x00000004,
+    VK_EXTERNAL_MEMORY_FEATURE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
+} VkExternalMemoryFeatureFlagBits;
+
+
+typedef VkExternalMemoryHandleTypeFlags VkExternalMemoryHandleTypeFlagsKHR;
+
+
+typedef enum VmaAllocatorCreateFlagBits
+{
     VMA_ALLOCATOR_CREATE_EXTERNALLY_SYNCHRONIZED_BIT = 0x00000001,
     VMA_ALLOCATOR_CREATE_KHR_DEDICATED_ALLOCATION_BIT = 0x00000002,
+    VMA_ALLOCATOR_CREATE_KHR_BIND_MEMORY2_BIT = 0x00000004,
+    VMA_ALLOCATOR_CREATE_EXT_MEMORY_BUDGET_BIT = 0x00000008,
+    VMA_ALLOCATOR_CREATE_AMD_DEVICE_COHERENT_MEMORY_BIT = 0x00000010,
+    VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT = 0x00000020,
+    VMA_ALLOCATOR_CREATE_EXT_MEMORY_PRIORITY_BIT = 0x00000040,
     VMA_ALLOCATOR_CREATE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
 } VmaAllocatorCreateFlagBits;
 typedef VkFlags VmaAllocatorCreateFlags;
-typedef struct VmaVulkanFunctions {
-    PFN_vkGetPhysicalDeviceProperties vkGetPhysicalDeviceProperties;
-    PFN_vkGetPhysicalDeviceMemoryProperties vkGetPhysicalDeviceMemoryProperties;
-    PFN_vkAllocateMemory vkAllocateMemory;
-    PFN_vkFreeMemory vkFreeMemory;
-    PFN_vkMapMemory vkMapMemory;
-    PFN_vkUnmapMemory vkUnmapMemory;
-    PFN_vkBindBufferMemory vkBindBufferMemory;
-    PFN_vkBindImageMemory vkBindImageMemory;
-    PFN_vkGetBufferMemoryRequirements vkGetBufferMemoryRequirements;
-    PFN_vkGetImageMemoryRequirements vkGetImageMemoryRequirements;
-    PFN_vkCreateBuffer vkCreateBuffer;
-    PFN_vkDestroyBuffer vkDestroyBuffer;
-    PFN_vkCreateImage vkCreateImage;
-    PFN_vkDestroyImage vkDestroyImage;
-    PFN_vkGetBufferMemoryRequirements2KHR vkGetBufferMemoryRequirements2KHR;
-    PFN_vkGetImageMemoryRequirements2KHR vkGetImageMemoryRequirements2KHR;
-} VmaVulkanFunctions;
-typedef struct VmaAllocatorCreateInfo
-{
-    VmaAllocatorCreateFlags flags;
-    VkPhysicalDevice physicalDevice;
-    VkDevice device;
-    VkDeviceSize preferredLargeHeapBlockSize;
-    VkDeviceSize preferredSmallHeapBlockSize;
-    const VkAllocationCallbacks* pAllocationCallbacks;
-    const VmaDeviceMemoryCallbacks* pDeviceMemoryCallbacks;
-    uint32_t frameInUseCount;
-    const VkDeviceSize* pHeapSizeLimit;
-    const VmaVulkanFunctions* pVulkanFunctions;
-} VmaAllocatorCreateInfo;
-VkResult vmaCreateAllocator(
-    const VmaAllocatorCreateInfo* pCreateInfo,
-    VmaAllocator* pAllocator);
-void vmaDestroyAllocator(
-    VmaAllocator allocator);
-void vmaGetPhysicalDeviceProperties(
-    VmaAllocator allocator,
-    const VkPhysicalDeviceProperties** ppPhysicalDeviceProperties);
-void vmaGetMemoryProperties(
-    VmaAllocator allocator,
-    const VkPhysicalDeviceMemoryProperties** ppPhysicalDeviceMemoryProperties);
-void vmaGetMemoryTypeProperties(
-    VmaAllocator allocator,
-    uint32_t memoryTypeIndex,
-    VkMemoryPropertyFlags* pFlags);
-void vmaSetCurrentFrameIndex(
-    VmaAllocator allocator,
-    uint32_t frameIndex);
-typedef struct VmaStatInfo
-{
-    uint32_t blockCount;
-    uint32_t allocationCount;
-    uint32_t unusedRangeCount;
-    VkDeviceSize usedBytes;
-    VkDeviceSize unusedBytes;
-    VkDeviceSize allocationSizeMin, allocationSizeAvg, allocationSizeMax;
-    VkDeviceSize unusedRangeSizeMin, unusedRangeSizeAvg, unusedRangeSizeMax;
-} VmaStatInfo;
-typedef struct VmaStats
-{
-    VmaStatInfo memoryType[32];
-    VmaStatInfo memoryHeap[16];
-    VmaStatInfo total;
-} VmaStats;
-void vmaCalculateStats(
-    VmaAllocator allocator,
-    VmaStats* pStats);
-void vmaBuildStatsString(
-    VmaAllocator allocator,
-    char** ppStatsString,
-    VkBool32 detailedMap);
-void vmaFreeStatsString(
-    VmaAllocator allocator,
-    char* pStatsString);
-typedef struct VmaPool_T* VmaPool;
 typedef enum VmaMemoryUsage
 {
     VMA_MEMORY_USAGE_UNKNOWN = 0,
@@ -967,18 +754,184 @@ typedef enum VmaMemoryUsage
     VMA_MEMORY_USAGE_CPU_ONLY = 2,
     VMA_MEMORY_USAGE_CPU_TO_GPU = 3,
     VMA_MEMORY_USAGE_GPU_TO_CPU = 4,
+    VMA_MEMORY_USAGE_CPU_COPY = 5,
+    VMA_MEMORY_USAGE_GPU_LAZILY_ALLOCATED = 6,
+    VMA_MEMORY_USAGE_AUTO = 7,
+    VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE = 8,
+    VMA_MEMORY_USAGE_AUTO_PREFER_HOST = 9,
     VMA_MEMORY_USAGE_MAX_ENUM = 0x7FFFFFFF
 } VmaMemoryUsage;
-typedef enum VmaAllocationCreateFlagBits {
+typedef enum VmaAllocationCreateFlagBits
+{
     VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT = 0x00000001,
     VMA_ALLOCATION_CREATE_NEVER_ALLOCATE_BIT = 0x00000002,
     VMA_ALLOCATION_CREATE_MAPPED_BIT = 0x00000004,
-    VMA_ALLOCATION_CREATE_CAN_BECOME_LOST_BIT = 0x00000008,
-    VMA_ALLOCATION_CREATE_CAN_MAKE_OTHER_LOST_BIT = 0x00000010,
     VMA_ALLOCATION_CREATE_USER_DATA_COPY_STRING_BIT = 0x00000020,
+    VMA_ALLOCATION_CREATE_UPPER_ADDRESS_BIT = 0x00000040,
+    VMA_ALLOCATION_CREATE_DONT_BIND_BIT = 0x00000080,
+    VMA_ALLOCATION_CREATE_WITHIN_BUDGET_BIT = 0x00000100,
+    VMA_ALLOCATION_CREATE_CAN_ALIAS_BIT = 0x00000200,
+    VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT = 0x00000400,
+    VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT = 0x00000800,
+    VMA_ALLOCATION_CREATE_HOST_ACCESS_ALLOW_TRANSFER_INSTEAD_BIT = 0x00001000,
+    VMA_ALLOCATION_CREATE_STRATEGY_MIN_MEMORY_BIT = 0x00010000,
+    VMA_ALLOCATION_CREATE_STRATEGY_MIN_TIME_BIT = 0x00020000,
+    VMA_ALLOCATION_CREATE_STRATEGY_MIN_OFFSET_BIT = 0x00040000,
+    VMA_ALLOCATION_CREATE_STRATEGY_BEST_FIT_BIT = VMA_ALLOCATION_CREATE_STRATEGY_MIN_MEMORY_BIT,
+    VMA_ALLOCATION_CREATE_STRATEGY_FIRST_FIT_BIT = VMA_ALLOCATION_CREATE_STRATEGY_MIN_TIME_BIT,
+    VMA_ALLOCATION_CREATE_STRATEGY_MASK =
+        VMA_ALLOCATION_CREATE_STRATEGY_MIN_MEMORY_BIT |
+        VMA_ALLOCATION_CREATE_STRATEGY_MIN_TIME_BIT |
+        VMA_ALLOCATION_CREATE_STRATEGY_MIN_OFFSET_BIT,
     VMA_ALLOCATION_CREATE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
 } VmaAllocationCreateFlagBits;
 typedef VkFlags VmaAllocationCreateFlags;
+typedef enum VmaPoolCreateFlagBits
+{
+    VMA_POOL_CREATE_IGNORE_BUFFER_IMAGE_GRANULARITY_BIT = 0x00000002,
+    VMA_POOL_CREATE_LINEAR_ALGORITHM_BIT = 0x00000004,
+    VMA_POOL_CREATE_ALGORITHM_MASK =
+        VMA_POOL_CREATE_LINEAR_ALGORITHM_BIT,
+    VMA_POOL_CREATE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
+} VmaPoolCreateFlagBits;
+typedef VkFlags VmaPoolCreateFlags;
+typedef enum VmaDefragmentationFlagBits
+{
+    VMA_DEFRAGMENTATION_FLAG_ALGORITHM_FAST_BIT = 0x1,
+    VMA_DEFRAGMENTATION_FLAG_ALGORITHM_BALANCED_BIT = 0x2,
+    VMA_DEFRAGMENTATION_FLAG_ALGORITHM_FULL_BIT = 0x4,
+    VMA_DEFRAGMENTATION_FLAG_ALGORITHM_EXTENSIVE_BIT = 0x8,
+    VMA_DEFRAGMENTATION_FLAG_ALGORITHM_MASK =
+        VMA_DEFRAGMENTATION_FLAG_ALGORITHM_FAST_BIT |
+        VMA_DEFRAGMENTATION_FLAG_ALGORITHM_BALANCED_BIT |
+        VMA_DEFRAGMENTATION_FLAG_ALGORITHM_FULL_BIT |
+        VMA_DEFRAGMENTATION_FLAG_ALGORITHM_EXTENSIVE_BIT,
+    VMA_DEFRAGMENTATION_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
+} VmaDefragmentationFlagBits;
+typedef VkFlags VmaDefragmentationFlags;
+typedef enum VmaDefragmentationMoveOperation
+{
+    VMA_DEFRAGMENTATION_MOVE_OPERATION_COPY = 0,
+    VMA_DEFRAGMENTATION_MOVE_OPERATION_IGNORE = 1,
+    VMA_DEFRAGMENTATION_MOVE_OPERATION_DESTROY = 2,
+} VmaDefragmentationMoveOperation;
+typedef enum VmaVirtualBlockCreateFlagBits
+{
+    VMA_VIRTUAL_BLOCK_CREATE_LINEAR_ALGORITHM_BIT = 0x00000001,
+    VMA_VIRTUAL_BLOCK_CREATE_ALGORITHM_MASK =
+        VMA_VIRTUAL_BLOCK_CREATE_LINEAR_ALGORITHM_BIT,
+    VMA_VIRTUAL_BLOCK_CREATE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
+} VmaVirtualBlockCreateFlagBits;
+typedef VkFlags VmaVirtualBlockCreateFlags;
+typedef enum VmaVirtualAllocationCreateFlagBits
+{
+    VMA_VIRTUAL_ALLOCATION_CREATE_UPPER_ADDRESS_BIT = VMA_ALLOCATION_CREATE_UPPER_ADDRESS_BIT,
+    VMA_VIRTUAL_ALLOCATION_CREATE_STRATEGY_MIN_MEMORY_BIT = VMA_ALLOCATION_CREATE_STRATEGY_MIN_MEMORY_BIT,
+    VMA_VIRTUAL_ALLOCATION_CREATE_STRATEGY_MIN_TIME_BIT = VMA_ALLOCATION_CREATE_STRATEGY_MIN_TIME_BIT,
+    VMA_VIRTUAL_ALLOCATION_CREATE_STRATEGY_MIN_OFFSET_BIT = VMA_ALLOCATION_CREATE_STRATEGY_MIN_OFFSET_BIT,
+    VMA_VIRTUAL_ALLOCATION_CREATE_STRATEGY_MASK = VMA_ALLOCATION_CREATE_STRATEGY_MASK,
+    VMA_VIRTUAL_ALLOCATION_CREATE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
+} VmaVirtualAllocationCreateFlagBits;
+typedef VkFlags VmaVirtualAllocationCreateFlags;
+typedef struct VmaAllocator_T* VmaAllocator;
+typedef struct VmaPool_T* VmaPool;
+typedef struct VmaAllocation_T* VmaAllocation;
+typedef struct VmaDefragmentationContext_T* VmaDefragmentationContext;
+typedef struct VmaVirtualAllocation_T *VmaVirtualAllocation;;
+typedef struct VmaVirtualBlock_T* VmaVirtualBlock;
+typedef void (* PFN_vmaAllocateDeviceMemoryFunction)(
+    VmaAllocator  allocator,
+    uint32_t memoryType,
+    VkDeviceMemory  memory,
+    VkDeviceSize size,
+    void*  pUserData);
+typedef void (* PFN_vmaFreeDeviceMemoryFunction)(
+    VmaAllocator  allocator,
+    uint32_t memoryType,
+    VkDeviceMemory  memory,
+    VkDeviceSize size,
+    void*  pUserData);
+typedef struct VmaDeviceMemoryCallbacks
+{
+    PFN_vmaAllocateDeviceMemoryFunction  pfnAllocate;
+    PFN_vmaFreeDeviceMemoryFunction  pfnFree;
+    void*  pUserData;
+} VmaDeviceMemoryCallbacks;
+typedef struct VmaVulkanFunctions
+{
+    PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr;
+    PFN_vkGetDeviceProcAddr vkGetDeviceProcAddr;
+    PFN_vkFreeMemory  vkFreeMemory;
+    PFN_vkMapMemory  vkMapMemory;
+    PFN_vkUnmapMemory  vkUnmapMemory;
+    PFN_vkFlushMappedMemoryRanges  vkFlushMappedMemoryRanges;
+    PFN_vkInvalidateMappedMemoryRanges  vkInvalidateMappedMemoryRanges;
+    PFN_vkBindBufferMemory  vkBindBufferMemory;
+    PFN_vkBindImageMemory  vkBindImageMemory;
+    PFN_vkGetBufferMemoryRequirements  vkGetBufferMemoryRequirements;
+    PFN_vkGetImageMemoryRequirements  vkGetImageMemoryRequirements;
+    PFN_vkCreateBuffer  vkCreateBuffer;
+    PFN_vkDestroyBuffer  vkDestroyBuffer;
+    PFN_vkCreateImage  vkCreateImage;
+    PFN_vkDestroyImage  vkDestroyImage;
+    PFN_vkCmdCopyBuffer  vkCmdCopyBuffer;
+    PFN_vkGetBufferMemoryRequirements2KHR  vkGetBufferMemoryRequirements2KHR;
+    PFN_vkGetImageMemoryRequirements2KHR  vkGetImageMemoryRequirements2KHR;
+    PFN_vkBindBufferMemory2KHR  vkBindBufferMemory2KHR;
+    PFN_vkBindImageMemory2KHR  vkBindImageMemory2KHR;
+    PFN_vkGetPhysicalDeviceMemoryProperties2KHR  vkGetPhysicalDeviceMemoryProperties2KHR;
+    PFN_vkGetDeviceBufferMemoryRequirements  vkGetDeviceBufferMemoryRequirements;
+    PFN_vkGetDeviceImageMemoryRequirements  vkGetDeviceImageMemoryRequirements;
+    ...;
+} VmaVulkanFunctions;
+typedef struct VmaAllocatorCreateInfo
+{
+    VmaAllocatorCreateFlags flags;
+    VkPhysicalDevice  physicalDevice;
+    VkDevice  device;
+    VkDeviceSize preferredLargeHeapBlockSize;
+    const VkAllocationCallbacks*  pAllocationCallbacks;
+    const VmaDeviceMemoryCallbacks*  pDeviceMemoryCallbacks;
+    const VkDeviceSize*  pHeapSizeLimit;
+    const VmaVulkanFunctions*  pVulkanFunctions;
+    VkInstance  instance;
+    uint32_t vulkanApiVersion;
+    const VkExternalMemoryHandleTypeFlagsKHR*  pTypeExternalMemoryHandleTypes;
+} VmaAllocatorCreateInfo;
+typedef struct VmaAllocatorInfo
+{
+    VkInstance  instance;
+    VkPhysicalDevice  physicalDevice;
+    VkDevice  device;
+} VmaAllocatorInfo;
+typedef struct VmaStatistics
+{
+    uint32_t blockCount;
+    uint32_t allocationCount;
+    VkDeviceSize blockBytes;
+    VkDeviceSize allocationBytes;
+} VmaStatistics;
+typedef struct VmaDetailedStatistics
+{
+    VmaStatistics statistics;
+    uint32_t unusedRangeCount;
+    VkDeviceSize allocationSizeMin;
+    VkDeviceSize allocationSizeMax;
+    VkDeviceSize unusedRangeSizeMin;
+    VkDeviceSize unusedRangeSizeMax;
+} VmaDetailedStatistics;
+typedef struct VmaTotalStatistics
+{
+    VmaDetailedStatistics memoryType[32U];
+    VmaDetailedStatistics memoryHeap[16U];
+    VmaDetailedStatistics total;
+} VmaTotalStatistics;
+typedef struct VmaBudget
+{
+    VmaStatistics statistics;
+    VkDeviceSize usage;
+    VkDeviceSize budget;
+} VmaBudget;
 typedef struct VmaAllocationCreateInfo
 {
     VmaAllocationCreateFlags flags;
@@ -986,133 +939,365 @@ typedef struct VmaAllocationCreateInfo
     VkMemoryPropertyFlags requiredFlags;
     VkMemoryPropertyFlags preferredFlags;
     uint32_t memoryTypeBits;
-    VmaPool pool;
-    void* pUserData;
+    VmaPool  pool;
+    void*  pUserData;
+    float priority;
 } VmaAllocationCreateInfo;
-VkResult vmaFindMemoryTypeIndex(
-    VmaAllocator allocator,
-    uint32_t memoryTypeBits,
-    const VmaAllocationCreateInfo* pAllocationCreateInfo,
-    uint32_t* pMemoryTypeIndex);
-typedef enum VmaPoolCreateFlagBits {
-    VMA_POOL_CREATE_IGNORE_BUFFER_IMAGE_GRANULARITY_BIT = 0x00000002,
-    VMA_POOL_CREATE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
-} VmaPoolCreateFlagBits;
-typedef VkFlags VmaPoolCreateFlags;
-typedef struct VmaPoolCreateInfo {
+typedef struct VmaPoolCreateInfo
+{
     uint32_t memoryTypeIndex;
     VmaPoolCreateFlags flags;
     VkDeviceSize blockSize;
     size_t minBlockCount;
     size_t maxBlockCount;
-    uint32_t frameInUseCount;
+    float priority;
+    VkDeviceSize minAllocationAlignment;
+    void*  pMemoryAllocateNext;
 } VmaPoolCreateInfo;
-typedef struct VmaPoolStats {
-    VkDeviceSize size;
-    VkDeviceSize unusedSize;
-    size_t allocationCount;
-    size_t unusedRangeCount;
-    VkDeviceSize unusedRangeSizeMax;
-} VmaPoolStats;
-VkResult vmaCreatePool(
- VmaAllocator allocator,
- const VmaPoolCreateInfo* pCreateInfo,
- VmaPool* pPool);
-void vmaDestroyPool(
-    VmaAllocator allocator,
-    VmaPool pool);
-void vmaGetPoolStats(
-    VmaAllocator allocator,
-    VmaPool pool,
-    VmaPoolStats* pPoolStats);
-void vmaMakePoolAllocationsLost(
-    VmaAllocator allocator,
-    VmaPool pool,
-    size_t* pLostAllocationCount);
-typedef struct VmaAllocation_T* VmaAllocation;
-typedef struct VmaAllocationInfo {
+typedef struct VmaAllocationInfo
+{
     uint32_t memoryType;
-    VkDeviceMemory deviceMemory;
+    VkDeviceMemory  deviceMemory;
     VkDeviceSize offset;
     VkDeviceSize size;
-    void* pMappedData;
-    void* pUserData;
+    void*  pMappedData;
+    void*  pUserData;
+    const char*  pName;
 } VmaAllocationInfo;
-VkResult vmaAllocateMemory(
-    VmaAllocator allocator,
-    const VkMemoryRequirements* pVkMemoryRequirements,
-    const VmaAllocationCreateInfo* pCreateInfo,
-    VmaAllocation* pAllocation,
-    VmaAllocationInfo* pAllocationInfo);
-VkResult vmaAllocateMemoryForBuffer(
-    VmaAllocator allocator,
-    VkBuffer buffer,
-    const VmaAllocationCreateInfo* pCreateInfo,
-    VmaAllocation* pAllocation,
-    VmaAllocationInfo* pAllocationInfo);
-VkResult vmaAllocateMemoryForImage(
-    VmaAllocator allocator,
-    VkImage image,
-    const VmaAllocationCreateInfo* pCreateInfo,
-    VmaAllocation* pAllocation,
-    VmaAllocationInfo* pAllocationInfo);
-void vmaFreeMemory(
-    VmaAllocator allocator,
-    VmaAllocation allocation);
-void vmaGetAllocationInfo(
-    VmaAllocator allocator,
-    VmaAllocation allocation,
-    VmaAllocationInfo* pAllocationInfo);
-void vmaSetAllocationUserData(
-    VmaAllocator allocator,
-    VmaAllocation allocation,
-    void* pUserData);
-void vmaCreateLostAllocation(
-    VmaAllocator allocator,
-    VmaAllocation* pAllocation);
-VkResult vmaMapMemory(
-    VmaAllocator allocator,
-    VmaAllocation allocation,
-    void** ppData);
-void vmaUnmapMemory(
-    VmaAllocator allocator,
-    VmaAllocation allocation);
-typedef struct VmaDefragmentationInfo {
-    VkDeviceSize maxBytesToMove;
-    uint32_t maxAllocationsToMove;
+typedef struct VmaAllocationInfo2
+{
+    VmaAllocationInfo allocationInfo;
+    VkDeviceSize blockSize;
+    VkBool32 dedicatedMemory;
+} VmaAllocationInfo2;
+typedef VkBool32 (* PFN_vmaCheckDefragmentationBreakFunction)(void*  pUserData);
+typedef struct VmaDefragmentationInfo
+{
+    VmaDefragmentationFlags flags;
+    VmaPool  pool;
+    VkDeviceSize maxBytesPerPass;
+    uint32_t maxAllocationsPerPass;
+    PFN_vmaCheckDefragmentationBreakFunction  pfnBreakCallback;
+    void*  pBreakCallbackUserData;
 } VmaDefragmentationInfo;
-typedef struct VmaDefragmentationStats {
+typedef struct VmaDefragmentationMove
+{
+    VmaDefragmentationMoveOperation operation;
+    VmaAllocation  srcAllocation;
+    VmaAllocation  dstTmpAllocation;
+} VmaDefragmentationMove;
+typedef struct VmaDefragmentationPassMoveInfo
+{
+    uint32_t moveCount;
+    VmaDefragmentationMove*  pMoves;
+} VmaDefragmentationPassMoveInfo;
+typedef struct VmaDefragmentationStats
+{
     VkDeviceSize bytesMoved;
     VkDeviceSize bytesFreed;
     uint32_t allocationsMoved;
     uint32_t deviceMemoryBlocksFreed;
 } VmaDefragmentationStats;
-VkResult vmaDefragment(
-    VmaAllocator allocator,
-    VmaAllocation* pAllocations,
+typedef struct VmaVirtualBlockCreateInfo
+{
+    VkDeviceSize size;
+    VmaVirtualBlockCreateFlags flags;
+    const VkAllocationCallbacks*  pAllocationCallbacks;
+} VmaVirtualBlockCreateInfo;
+typedef struct VmaVirtualAllocationCreateInfo
+{
+    VkDeviceSize size;
+    VkDeviceSize alignment;
+    VmaVirtualAllocationCreateFlags flags;
+    void*  pUserData;
+} VmaVirtualAllocationCreateInfo;
+typedef struct VmaVirtualAllocationInfo
+{
+    VkDeviceSize offset;
+    VkDeviceSize size;
+    void*  pUserData;
+} VmaVirtualAllocationInfo;
+             VkResult vmaCreateAllocator(
+    const VmaAllocatorCreateInfo*  pCreateInfo,
+    VmaAllocator *  pAllocator);
+             void vmaDestroyAllocator(
+    VmaAllocator  allocator);
+             void vmaGetAllocatorInfo(
+    VmaAllocator  allocator,
+    VmaAllocatorInfo*  pAllocatorInfo);
+             void vmaGetPhysicalDeviceProperties(
+    VmaAllocator  allocator,
+    const VkPhysicalDeviceProperties* *  ppPhysicalDeviceProperties);
+             void vmaGetMemoryProperties(
+    VmaAllocator  allocator,
+    const VkPhysicalDeviceMemoryProperties* *  ppPhysicalDeviceMemoryProperties);
+             void vmaGetMemoryTypeProperties(
+    VmaAllocator  allocator,
+    uint32_t memoryTypeIndex,
+    VkMemoryPropertyFlags*  pFlags);
+             void vmaSetCurrentFrameIndex(
+    VmaAllocator  allocator,
+    uint32_t frameIndex);
+             void vmaCalculateStatistics(
+    VmaAllocator  allocator,
+    VmaTotalStatistics*  pStats);
+             void vmaGetHeapBudgets(
+    VmaAllocator  allocator,
+    VmaBudget*  pBudgets);
+             VkResult vmaFindMemoryTypeIndex(
+    VmaAllocator  allocator,
+    uint32_t memoryTypeBits,
+    const VmaAllocationCreateInfo*  pAllocationCreateInfo,
+    uint32_t*  pMemoryTypeIndex);
+             VkResult vmaFindMemoryTypeIndexForBufferInfo(
+    VmaAllocator  allocator,
+    const VkBufferCreateInfo*  pBufferCreateInfo,
+    const VmaAllocationCreateInfo*  pAllocationCreateInfo,
+    uint32_t*  pMemoryTypeIndex);
+             VkResult vmaFindMemoryTypeIndexForImageInfo(
+    VmaAllocator  allocator,
+    const VkImageCreateInfo*  pImageCreateInfo,
+    const VmaAllocationCreateInfo*  pAllocationCreateInfo,
+    uint32_t*  pMemoryTypeIndex);
+             VkResult vmaCreatePool(
+    VmaAllocator  allocator,
+    const VmaPoolCreateInfo*  pCreateInfo,
+    VmaPool *  pPool);
+             void vmaDestroyPool(
+    VmaAllocator  allocator,
+    VmaPool  pool);
+             void vmaGetPoolStatistics(
+    VmaAllocator  allocator,
+    VmaPool  pool,
+    VmaStatistics*  pPoolStats);
+             void vmaCalculatePoolStatistics(
+    VmaAllocator  allocator,
+    VmaPool  pool,
+    VmaDetailedStatistics*  pPoolStats);
+             VkResult vmaCheckPoolCorruption(
+    VmaAllocator  allocator,
+    VmaPool  pool);
+             void vmaGetPoolName(
+    VmaAllocator  allocator,
+    VmaPool  pool,
+    const char* *  ppName);
+             void vmaSetPoolName(
+    VmaAllocator  allocator,
+    VmaPool  pool,
+    const char*  pName);
+             VkResult vmaAllocateMemory(
+    VmaAllocator  allocator,
+    const VkMemoryRequirements*  pVkMemoryRequirements,
+    const VmaAllocationCreateInfo*  pCreateInfo,
+    VmaAllocation *  pAllocation,
+    VmaAllocationInfo*  pAllocationInfo);
+             VkResult vmaAllocateMemoryPages(
+    VmaAllocator  allocator,
+    const VkMemoryRequirements*  pVkMemoryRequirements,
+    const VmaAllocationCreateInfo*  pCreateInfo,
     size_t allocationCount,
-    VkBool32* pAllocationsChanged,
-    const VmaDefragmentationInfo *pDefragmentationInfo,
-    VmaDefragmentationStats* pDefragmentationStats);
-VkResult vmaCreateBuffer(
-    VmaAllocator allocator,
-    const VkBufferCreateInfo* pBufferCreateInfo,
-    const VmaAllocationCreateInfo* pAllocationCreateInfo,
-    VkBuffer* pBuffer,
-    VmaAllocation* pAllocation,
-    VmaAllocationInfo* pAllocationInfo);
-void vmaDestroyBuffer(
-    VmaAllocator allocator,
-    VkBuffer buffer,
-    VmaAllocation allocation);
-VkResult vmaCreateImage(
-    VmaAllocator allocator,
-    const VkImageCreateInfo* pImageCreateInfo,
-    const VmaAllocationCreateInfo* pAllocationCreateInfo,
-    VkImage* pImage,
-    VmaAllocation* pAllocation,
-    VmaAllocationInfo* pAllocationInfo);
-void vmaDestroyImage(
-    VmaAllocator allocator,
-    VkImage image,
-    VmaAllocation allocation);
+    VmaAllocation *  pAllocations,
+    VmaAllocationInfo*  pAllocationInfo);
+             VkResult vmaAllocateMemoryForBuffer(
+    VmaAllocator  allocator,
+    VkBuffer  buffer,
+    const VmaAllocationCreateInfo*  pCreateInfo,
+    VmaAllocation *  pAllocation,
+    VmaAllocationInfo*  pAllocationInfo);
+             VkResult vmaAllocateMemoryForImage(
+    VmaAllocator  allocator,
+    VkImage  image,
+    const VmaAllocationCreateInfo*  pCreateInfo,
+    VmaAllocation *  pAllocation,
+    VmaAllocationInfo*  pAllocationInfo);
+             void vmaFreeMemory(
+    VmaAllocator  allocator,
+    const VmaAllocation  allocation);
+             void vmaFreeMemoryPages(
+    VmaAllocator  allocator,
+    size_t allocationCount,
+    const VmaAllocation *  pAllocations);
+             void vmaGetAllocationInfo(
+    VmaAllocator  allocator,
+    VmaAllocation  allocation,
+    VmaAllocationInfo*  pAllocationInfo);
+             void vmaGetAllocationInfo2(
+    VmaAllocator  allocator,
+    VmaAllocation  allocation,
+    VmaAllocationInfo2*  pAllocationInfo);
+             void vmaSetAllocationUserData(
+    VmaAllocator  allocator,
+    VmaAllocation  allocation,
+    void*  pUserData);
+             void vmaSetAllocationName(
+    VmaAllocator  allocator,
+    VmaAllocation  allocation,
+    const char*  pName);
+             void vmaGetAllocationMemoryProperties(
+    VmaAllocator  allocator,
+    VmaAllocation  allocation,
+    VkMemoryPropertyFlags*  pFlags);
+             VkResult vmaMapMemory(
+    VmaAllocator  allocator,
+    VmaAllocation  allocation,
+    void* *  ppData);
+             void vmaUnmapMemory(
+    VmaAllocator  allocator,
+    VmaAllocation  allocation);
+             VkResult vmaFlushAllocation(
+    VmaAllocator  allocator,
+    VmaAllocation  allocation,
+    VkDeviceSize offset,
+    VkDeviceSize size);
+             VkResult vmaInvalidateAllocation(
+    VmaAllocator  allocator,
+    VmaAllocation  allocation,
+    VkDeviceSize offset,
+    VkDeviceSize size);
+             VkResult vmaFlushAllocations(
+    VmaAllocator  allocator,
+    uint32_t allocationCount,
+    const VmaAllocation *  allocations,
+    const VkDeviceSize*  offsets,
+    const VkDeviceSize*  sizes);
+             VkResult vmaInvalidateAllocations(
+    VmaAllocator  allocator,
+    uint32_t allocationCount,
+    const VmaAllocation *  allocations,
+    const VkDeviceSize*  offsets,
+    const VkDeviceSize*  sizes);
+             VkResult vmaCheckCorruption(
+    VmaAllocator  allocator,
+    uint32_t memoryTypeBits);
+             VkResult vmaBeginDefragmentation(
+    VmaAllocator  allocator,
+    const VmaDefragmentationInfo*  pInfo,
+    VmaDefragmentationContext *  pContext);
+             void vmaEndDefragmentation(
+    VmaAllocator  allocator,
+    VmaDefragmentationContext  context,
+    VmaDefragmentationStats*  pStats);
+             VkResult vmaBeginDefragmentationPass(
+    VmaAllocator  allocator,
+    VmaDefragmentationContext  context,
+    VmaDefragmentationPassMoveInfo*  pPassInfo);
+             VkResult vmaEndDefragmentationPass(
+    VmaAllocator  allocator,
+    VmaDefragmentationContext  context,
+    VmaDefragmentationPassMoveInfo*  pPassInfo);
+             VkResult vmaBindBufferMemory(
+    VmaAllocator  allocator,
+    VmaAllocation  allocation,
+    VkBuffer  buffer);
+             VkResult vmaBindBufferMemory2(
+    VmaAllocator  allocator,
+    VmaAllocation  allocation,
+    VkDeviceSize allocationLocalOffset,
+    VkBuffer  buffer,
+    const void*  pNext);
+             VkResult vmaBindImageMemory(
+    VmaAllocator  allocator,
+    VmaAllocation  allocation,
+    VkImage  image);
+             VkResult vmaBindImageMemory2(
+    VmaAllocator  allocator,
+    VmaAllocation  allocation,
+    VkDeviceSize allocationLocalOffset,
+    VkImage  image,
+    const void*  pNext);
+             VkResult vmaCreateBuffer(
+    VmaAllocator  allocator,
+    const VkBufferCreateInfo*  pBufferCreateInfo,
+    const VmaAllocationCreateInfo*  pAllocationCreateInfo,
+    VkBuffer *  pBuffer,
+    VmaAllocation *  pAllocation,
+    VmaAllocationInfo*  pAllocationInfo);
+             VkResult vmaCreateBufferWithAlignment(
+    VmaAllocator  allocator,
+    const VkBufferCreateInfo*  pBufferCreateInfo,
+    const VmaAllocationCreateInfo*  pAllocationCreateInfo,
+    VkDeviceSize minAlignment,
+    VkBuffer *  pBuffer,
+    VmaAllocation *  pAllocation,
+    VmaAllocationInfo*  pAllocationInfo);
+             VkResult vmaCreateAliasingBuffer(
+    VmaAllocator  allocator,
+    VmaAllocation  allocation,
+    const VkBufferCreateInfo*  pBufferCreateInfo,
+    VkBuffer *  pBuffer);
+             VkResult vmaCreateAliasingBuffer2(
+    VmaAllocator  allocator,
+    VmaAllocation  allocation,
+    VkDeviceSize allocationLocalOffset,
+    const VkBufferCreateInfo*  pBufferCreateInfo,
+    VkBuffer *  pBuffer);
+             void vmaDestroyBuffer(
+    VmaAllocator  allocator,
+    VkBuffer  buffer,
+    VmaAllocation  allocation);
+             VkResult vmaCreateImage(
+    VmaAllocator  allocator,
+    const VkImageCreateInfo*  pImageCreateInfo,
+    const VmaAllocationCreateInfo*  pAllocationCreateInfo,
+    VkImage *  pImage,
+    VmaAllocation *  pAllocation,
+    VmaAllocationInfo*  pAllocationInfo);
+             VkResult vmaCreateAliasingImage(
+    VmaAllocator  allocator,
+    VmaAllocation  allocation,
+    const VkImageCreateInfo*  pImageCreateInfo,
+    VkImage *  pImage);
+             VkResult vmaCreateAliasingImage2(
+    VmaAllocator  allocator,
+    VmaAllocation  allocation,
+    VkDeviceSize allocationLocalOffset,
+    const VkImageCreateInfo*  pImageCreateInfo,
+    VkImage *  pImage);
+             void vmaDestroyImage(
+    VmaAllocator  allocator,
+    VkImage  image,
+    VmaAllocation  allocation);
+             VkResult vmaCreateVirtualBlock(
+    const VmaVirtualBlockCreateInfo*  pCreateInfo,
+    VmaVirtualBlock *  pVirtualBlock);
+             void vmaDestroyVirtualBlock(
+    VmaVirtualBlock  virtualBlock);
+             VkBool32 vmaIsVirtualBlockEmpty(
+    VmaVirtualBlock  virtualBlock);
+             void vmaGetVirtualAllocationInfo(
+    VmaVirtualBlock  virtualBlock,
+    VmaVirtualAllocation  allocation, VmaVirtualAllocationInfo*  pVirtualAllocInfo);
+             VkResult vmaVirtualAllocate(
+    VmaVirtualBlock  virtualBlock,
+    const VmaVirtualAllocationCreateInfo*  pCreateInfo,
+    VmaVirtualAllocation *  pAllocation,
+    VkDeviceSize*  pOffset);
+             void vmaVirtualFree(
+    VmaVirtualBlock  virtualBlock,
+    VmaVirtualAllocation  allocation);
+             void vmaClearVirtualBlock(
+    VmaVirtualBlock  virtualBlock);
+             void vmaSetVirtualAllocationUserData(
+    VmaVirtualBlock  virtualBlock,
+    VmaVirtualAllocation  allocation,
+    void*  pUserData);
+             void vmaGetVirtualBlockStatistics(
+    VmaVirtualBlock  virtualBlock,
+    VmaStatistics*  pStats);
+             void vmaCalculateVirtualBlockStatistics(
+    VmaVirtualBlock  virtualBlock,
+    VmaDetailedStatistics*  pStats);
+             void vmaBuildVirtualBlockStatsString(
+    VmaVirtualBlock  virtualBlock,
+    char* *  ppStatsString,
+    VkBool32 detailedMap);
+             void vmaFreeVirtualBlockStatsString(
+    VmaVirtualBlock  virtualBlock,
+    char*  pStatsString);
+             void vmaBuildStatsString(
+    VmaAllocator  allocator,
+    char* *  ppStatsString,
+    VkBool32 detailedMap);
+             void vmaFreeStatsString(
+    VmaAllocator  allocator,
+    char*  pStatsString);
